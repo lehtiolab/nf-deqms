@@ -43,7 +43,7 @@ NXF_OPTS='-Xms1g -Xmx4g'
 ## Running the pipeline
 The typical command for running the pipeline is as follows:
 ```bash
-nextflow run lehtiolab/nf-deqms --tables "proteins.txt;peptides.txt" --accessions "proteins;peptides"  --sampletable samples.txt -profile standard,docker
+nextflow run lehtiolab/nf-deqms --proteins proteins.txt --peptides peptides.txt --genes genes.txt --ensg ensg.txt --sampletable samples.txt -profile standard,docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
@@ -97,19 +97,14 @@ Use this parameter to choose a configuration profile. Profiles can give configur
 * `none`
     * No configuration at all. Useful if you want to build your own config from scratch and want to avoid loading in the default `base` config profile (not recommended).
 
-### `--tables`
-Use this to specify the location of your input tables (result tables from searches). Separate by semicolon:
+### `--proteins`, `--peptides`, `--genes`, `--ensg`
+Use these to specify the location of your input tables (result tables from searches), e.g.:
 
 ```bash
---tables "/path/to/data/proteins.txt;/path/to/data/genes.txt"
+--proteins "/path/to/data/proteins.txt" --genes "/path/to/data/genes.txt"
 ```
 
-
-### `--accessions`
-The tables respective accession type (for QC choose from peptides, proteins, genes, ensg, but any other name can be used, in which case no QC for this name is outputted):
-```bash
---accessions "proteins;genes"
-```
+You are free to use another table that does not match the accession option, e.g. `--peptides genes.txt`, it will only be output under the wrong identifier (here "Gene names") in the QC then.
 
 
 ### Differential expression analysis

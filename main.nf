@@ -19,16 +19,18 @@ def helpMessage() {
 
     The typical command for running the pipeline is as follows:
 
-    nextflow run lehtiolab/nf-deqms --tables "proteins.txt;peptides.txt" --accessions "proteins;peptides"  --sampletable samples.txt -profile standard,docker
+    nextflow run lehtiolab/nf-deqms --proteins proteins.txt --peptides peptides.txt --ensg ensg.txt --genes genes.txt --sampletable samples.txt -profile standard,docker
 
     Mandatory arguments:
-      --tables                      Paths to (protein/gene/peptide) tables with set-annotated quantitative results separated by semicolon
-      --accessions                  Accession names of the respective tables, separate by semicolon (peptides, proteins, genes, ensg)
       --sampletable                 Path to sample annotation table in case of isobaric analysis
       -profile                      Configuration profile to use. Can use multiple (comma separated)
                                     Available: standard, conda, docker, singularity, awsbatch, test
 
     Other options:
+      --peptides                    Path to peptide table with set-annotated quantitative results
+      --proteins                    Path to protein table with set-annotated quantitative results
+      --genes                       Path to gene table with set-annotated quantitative results
+      --ensg                        Path to ENSG table with set-annotated quantitative results
       --outdir                      The output directory where the results will be saved
       --email                       Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits
       -name                         Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
@@ -54,9 +56,11 @@ params.outdir = 'results'
 params.name = false
 params.email = false
 params.plaintext_email = false
-params.tables = false
+params.peptides = false
+params.proteins = false
+params.genes = false
+params.ensg = false
 params.sampletable = false
-params.accessions = false
 
 output_docs = file("$baseDir/docs/output.md")
 
@@ -101,8 +105,10 @@ summary['Pipeline Name']  = 'lehtiolab/nf-deqms'
 summary['Pipeline Version'] = workflow.manifest.version
 summary['Run Name']     = custom_runName ?: workflow.runName
 summary['Sample annotations'] = params.sampletable
-summary['Input tables'] = params.tables
-summary['Input accession types'] = params.accessions
+summary['Input peptides'] = params.peptides
+summary['Input proteins'] = params.proteins
+summary['Input genes'] = params.genes
+summary['Input ensg'] = params.ensg
 summary['Max Memory']   = params.max_memory
 summary['Max CPUs']     = params.max_cpus
 summary['Max Time']     = params.max_time
@@ -165,9 +171,8 @@ process get_software_versions {
 }
 
 
-tables = params.tables.tokenize(';')
-accessions = params.accessions.tokenize(';')
-Channel.from([accessions, tables].transpose())
+tables = [["peptides", params.peptides], ["proteins", params.proteins], ["genes", params.genes], ["ensg", params.ensg]]
+Channel.from(tables.findAll { it[1] })
 .map { it -> [it[0], file(it[1])] }
 .view()
   .combine(Channel.fromPath(params.sampletable))

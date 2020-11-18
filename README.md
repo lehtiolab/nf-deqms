@@ -21,13 +21,10 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 - run pipeline:
 
 ```
-nextflow run lehtiolab/nf-deqms --tables "proteins.txt;peptides.txt" --accessions "proteins;peptides"  --sampletable samples.txt -profile standard,docker
+nextflow run lehtiolab/nf-deqms --proteins proteins.txt --peptides peptides.txt --genes genes.txt --ensg ensg.txt --sampletable samples.txt -profile standard,docker
 ```
 
-You can use as many accession types as you like, separated by semicolons. So when also having gene centric data:
-```
-nextflow run lehtiolab/nf-deqms --tables "genes.txt;proteins.txt;ensg.txtpeptides.txt" --accessions "genes;proteins;ensg;peptides"  --sampletable samples.txt -profile standard,docker
-```
+You can leave out any accession that you do not have or are not interested in (e.g. `--ensg` in a Swissprot analysis).
 
 The lehtiolab/nf-deqms pipeline comes with documentation about the pipeline, found in the `docs/` directory:
 
